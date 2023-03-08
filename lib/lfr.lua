@@ -15,25 +15,25 @@ if iam == true then
       forever = false
     end
     while true do
-      _,_,shitboy,_,_,what = event.pull('modem_message')
+      _,_,shitboy,_,_,what = event.pull(math.huge,'modem_message')
       filepath = database[what] or '/huinya a ne path'
       if fs.exists(filepath) == false then 
         modem.broadcast(port,'file does not exists') 
       else
       file = fs.open(filepath,'r')
-      packetsize = math.ceil(fs.size(filepath)/1024)
-      modem.send(shitboy,port,'start sending')
+      packetsize = math.ceil(fs.size(filepath)/8192)
+      modem.broadcast(port,'start sending')
       i = 0 isnext = ''
       while true do
         i = i + 1
         if isnext == 'abort' then break end
         if i > packetsize then break end
-        local part = file:read(1024)
+        local part = file:read(8192)
         modem.broadcast(port,part)
         while true do
         addrs = ''
         isnext = ''
-        _,_,addrs,_,_,isnext = event.pull('modem_message')
+        _,_,addrs,_,_,isnext = event.pull(math.huge,'modem_message')
           if addrs == shitboy then
             if isnext == 'next' then 
               break
@@ -78,7 +78,7 @@ if iam == true then
     modem.open(port)
     modem.broadcast(port,what)
     while true do 
-      _,_, shitboy,_,_,ifstart = event.pull('modem_message') 
+      _,_, shitboy,_,_,ifstart = event.pull(math.huge,'modem_message') 
       if ifstart == 'start sending' then 
         break 
       elseif ifstart == 'file does not exists' then  
@@ -105,8 +105,5 @@ if iam == true then
     modem.close(port)
     return true, 'succes transfer', towhere
   end
-else
-  function toend.pull() print('insert a modem card.') end
-  function toend.request() print('insert a modem card.') end
 end
 return toend
